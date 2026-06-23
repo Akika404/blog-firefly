@@ -41,7 +41,7 @@ const getDynamicNavBarConfig = (): NavBarConfig => {
 
 	// 我的及其子菜单
 	links.push({
-		name: "我的",
+		name: "小屋",
 		url: "#",
 		icon: "material-symbols:person",
 		children: [
