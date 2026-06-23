@@ -60,7 +60,7 @@ const getDynamicNavBarConfig = (): NavBarConfig => {
 		icon: "material-symbols:info",
 		children: [
 			// 打赏
-			LinkPresets.Sponsor,
+			// LinkPresets.Sponsor,
 
 			// 关于页面
 			LinkPresets.About,
@@ -130,12 +130,12 @@ export const LinkPresets: Record<string, NavBarLink> = {
 		icon: "material-symbols:group",
 		pageKey: "friends",
 	},
-	Sponsor: {
-		name: "打赏",
-		url: "/sponsor/",
-		icon: "material-symbols:favorite",
-		pageKey: "sponsor",
-	},
+	// Sponsor: {
+	// 	name: "打赏",
+	// 	url: "/sponsor/",
+	// 	icon: "material-symbols:favorite",
+	// 	pageKey: "sponsor",
+	// },
 	// Guestbook: {
 	// 	name: "留言",
 	// 	url: "/guestbook/",
