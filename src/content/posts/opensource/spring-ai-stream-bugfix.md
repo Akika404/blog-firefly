@@ -1,18 +1,18 @@
 ---
-title: Spring AI 流式返回 Bug 修复记录
+title: 记一次给 Spring AI 修 Bug 的全过程
 published: 2026-05-24
 pinned: false
-description: 记录一次 Spring AI 流式方法不流式的 Bug 定位与修复。
+description: 记一次给 Spring AI 流式接口"非流式" Bug 的排查与修复实录，从群友的疑问顺着源码查到 collectList()。
 tags: [AI, Spring-AI, Java, 开源]
 category: 开源
 draft: false
 image: ./images/og-spring.png
 ---
-## 关于 Bug 的描述
+## 问题复现
 
-在使用 OpenAI 的 model 接入 Spring AI 的时候，stream 消息并不会流式返回，而是等待所有 chunks 收集完成后再一次性返回所有的 chunks。
+事情起因于群里一位同学的提问：他用 OpenAI 的模型接入 Spring AI，明明调用的是 `stream()`，结果消息并不流式。
 
-这个是一个群友发现的，我一度怀疑这位同学是不是用法错了，后来我自己复现了一下，还真是 Spring AI 的 Bug ...
+> 在使用 OpenAI 模型接入 Spring AI 时，流式（stream）消息没有逐个 chunk 返回，而是要等所有 chunk 收集完成后，才一次性全部返回。
 
 这个 Bug 还挺离谱的...
 
@@ -73,7 +73,7 @@ public class ChatController {
 
 而在换用 `DeepSeek` 的 `spring-ai-starter-model-deepseek` 后一切正常，恢复真正的流式。那可以猜测，问题出在OpenAI的 `spring-ai-starter-model-openai` 的实现上。
 
-## 关于 Spring AI 的 stream() 调用链
+## stream() 的调用链
 
 在定位之前，得先搞清楚一个请求到底是怎么流到 OpenAI 的。Spring AI 2.0 这套 Fluent API（`ChatClient`）并不直接调用模型，它会被一个「Advisor 顾问链」包裹，链路的最末端才是真正发起模型调用的 Advisor。
 
@@ -154,7 +154,7 @@ public Flux<ChatResponse> stream(Prompt prompt) {
 
 到这里就非常明确了：如果 OpenAI 的 streaming 出问题，关键点大概在 `OpenAiChatModel.stream()` 或它调用的 `internalStream()`。
 
-## OpenAiChatModel 是怎么接 OpenAI 流的
+## OpenAiChatModel 如何对接的 OpenAI 流
 
 真正的实现是 `internalStream()`。在最底层，Spring AI 用 OpenAI Java SDK 的异步 streaming API 订阅 chunk，然后把每个 chunk 转成 Spring AI 自己的 `ChatResponse`。下面这段为了方便阅读，省略了一部分 metadata 封装的代码：
 
@@ -268,7 +268,7 @@ OpenAI complete
 
 这段代码的意图是把后一个 chunk 里的 usage 补到前一个响应上，避免最终观测数据缺失。这个思路本身不是问题，问题是后面又为了构造最终响应做了 `collectList()`。
 
-第二个是 `tool call`。流式 `tool cal` 的参数通常是分多个 chunks 返回的，例如第一个 chunk 是：
+第二个是 `tool call`。流式 `tool call` 的参数通常是分多个 chunks 返回的，例如第一个 chunk 是：
 
 ```json
 {"city"
@@ -486,10 +486,10 @@ private Flux<ChatResponse> handleStreamingToolExecution(Prompt prompt, ChatRespo
 
 这样普通文本的流式体验和 tool call 的完整语义就都保留了。
 
-## 总结
+## 写在最后
 
 修完以后，再跑最开始的 Controller，`doOnNext` 终于会在 OpenAI chunk 到达时立即触发了，而不是等所有 chunk 收集完成以后才一次性倾泻出来。
 
-整个 Bug 的根源其实很简单：一个 `collectList()` 把流式语义变成了批处理语义，这也是 Reactor 代码比较容易踩坑的地方，操作符的语义往往和它的名字不完全对应，`collectList()`、`reduce()`、`buffer()` 这些操作都会「攒」数据，稍不注意就把流式变成了阻塞。
+这个 Bug 的根源其实很简单：一个 `collectList()` 把流式语义变成了批处理，这也是 Reactor 代码比较容易踩坑的地方，操作符的语义往往和它的名字不完全对应，`collectList()`、`reduce()`、`buffer()` 这些操作都会「攒」数据，稍不注意就把流式变成了阻塞。
 
-最后，虽然这个 [PR](https://github.com/spring-projects/spring-ai/pull/6139) 没有被合并（Spring AI 在 2.0.0-RC1 里直接重写了 `stream()` 方法），但是从发现问题到解决问题的过程中获得的乐趣和成就感是无可替代的。
+最后，虽然这个 [PR](https://github.com/spring-projects/spring-ai/pull/6139) 最终没有被合并（Spring AI 在 2.0.0-RC1 里直接重写了 `stream()` 方法），但从发现问题到解决问题这一路，还是挺有意思的喵。
