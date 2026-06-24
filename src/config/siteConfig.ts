@@ -9,10 +9,10 @@ export const siteConfig: SiteConfig = {
 	title: "Firefly",
 
 	// 站点副标题
-	subtitle: "Meika的技术小屋",
+	subtitle: "Meika's Blog",
 
 	// 站点 URL
-	site_url: "https://gmj-neko.me",
+	site_url: "https://gmjneko.me",
 
 	// 站点描述
 	description:
@@ -20,13 +20,18 @@ export const siteConfig: SiteConfig = {
 
 	// 站点关键词
 	keywords: [
+		"Meika",
 		"Firefly",
 		"Fuwari",
-		"Astro",
-		"ACGN",
+		"AI",
+		"LLM",
+		"Java",
+		"Kotlin",
+		"Kotlin	Multiplatform",
+		"AI Infra",
+		"Deep Learning",
 		"博客",
 		"技术博客",
-		"静态博客",
 	],
 
 	// 主题色
@@ -56,11 +61,11 @@ export const siteConfig: SiteConfig = {
 	favicon: [
 		{
 			// 图标文件路径
-			src: "/favicon/favicon.ico",
+			src: "/favicon/firefly_icon.ico",
 			// 可选，指定主题 'light' | 'dark'
 			// theme: "light",
 			// 可选，图标大小
-			// sizes: "32x32",
+			sizes: "32x32",
 		},
 	],
 
