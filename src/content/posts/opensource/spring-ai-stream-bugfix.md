@@ -12,7 +12,11 @@ image: ./images/og-spring.png
 
 在使用 OpenAI 的 model 接入 Spring AI 的时候，stream 消息并不会流式返回，而是等待所有 chunks 收集完成后再一次性返回所有的 chunks。
 
-这个是一个群友发现的，我一度怀疑这位同学是不是用法错了，后来我自己复现了一下，还真是...
+这个是一个群友发现的，我一度怀疑这位同学是不是用法错了，后来我自己复现了一下，还真是 Spring AI 的 Bug ...
+
+这个 Bug 还挺离谱的...
+
+![来自群友的震惊](./images/wechat_message_shot.png)
 
 复现代码如下：
 
