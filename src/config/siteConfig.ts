@@ -24,6 +24,7 @@ export const siteConfig: SiteConfig = {
 		"Firefly",
 		"Fuwari",
 		"AI",
+		"Agent",
 		"LLM",
 		"Java",
 		"Kotlin",
