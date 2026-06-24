@@ -9,14 +9,14 @@ export const siteConfig: SiteConfig = {
 	title: "Firefly",
 
 	// 站点副标题
-	subtitle: "Minka的技术小屋",
+	subtitle: "Meika的技术小屋",
 
 	// 站点 URL
 	site_url: "https://gmj-neko.me",
 
 	// 站点描述
 	description:
-		"这里是 Minka 的博客，这里会记录一些我的学习记录，以及关于技术本身的思考。",
+		"这里是 MeikaGe 的博客，这里会记录一些我的学习记录，以及关于技术本身的思考。",
 
 	// 站点关键词
 	keywords: [
